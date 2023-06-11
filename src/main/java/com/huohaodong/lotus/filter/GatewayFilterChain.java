@@ -1,9 +1,9 @@
 package com.huohaodong.lotus.filter;
 
-import java.util.List;
-import java.util.function.BiPredicate;
+import com.huohaodong.lotus.context.GatewayContext;
 
-public class GatewayFilterChain {
-    private List<GatewayFilter> filters;
+public interface GatewayFilterChain {
+
+    void filter(GatewayContext ctx);
 
 }
