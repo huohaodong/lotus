@@ -12,7 +12,8 @@ import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class GatewayHttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
         ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(), HttpResponseStatus.OK, Unpooled.wrappedBuffer("lotus gateway".getBytes()))).addListener(ChannelFutureListener.CLOSE);
