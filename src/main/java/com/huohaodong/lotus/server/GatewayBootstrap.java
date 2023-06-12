@@ -43,8 +43,8 @@ public class GatewayBootstrap {
         // Object -> Route Definition (Filter Definition + Predicate Definition + uri + order + id)
         List<RouteDefinition> routeDefinitions = gatewayProperties.populate();
         log.info("load Route Definitions: {}, from GatewayProperties.yml: ", routeDefinitions);
+        // TODO: Route Definition -> Route
 
-        //
     }
 
     private void startGatewayServer() {
