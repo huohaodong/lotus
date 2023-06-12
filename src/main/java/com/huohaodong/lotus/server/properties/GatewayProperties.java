@@ -46,10 +46,6 @@ public class GatewayProperties {
 
     private List<RouteProperties> routes = new ArrayList<>();
 
-    public List<RouteDefinition> populate(GatewayProperties gatewayProperties) {
-        return gatewayProperties.getRoutes().stream().map(Converter::convert).toList();
-    }
-
     public List<RouteDefinition> populate() {
         return getRoutes().stream().map(Converter::convert).toList();
     }
