@@ -7,11 +7,6 @@ import org.asynchttpclient.RequestBuilder;
 @Data
 public class GatewayRequest {
     /**
-     * HTTP 请求的用户 ip
-     */
-    private final String clientIp;
-
-    /**
      * 原始 HTTP 请求报文
      */
     private final FullHttpRequest fullHttpRequest;

@@ -5,10 +5,11 @@ import com.huohaodong.lotus.predicate.RoutePredicate;
 import lombok.Data;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Route {
+public class Route implements Comparable<Route> {
 
     private final String id;
 
@@ -16,8 +17,12 @@ public class Route {
 
     private final int order;
 
-    private final RoutePredicate routePredicate;
+    private final List<RoutePredicate> routePredicate;
 
     private final List<GatewayFilter> filters;
 
+    @Override
+    public int compareTo(Route o) {
+        return this.order - o.order;
+    }
 }

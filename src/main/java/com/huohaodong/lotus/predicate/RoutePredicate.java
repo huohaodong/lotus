@@ -1,5 +1,9 @@
 package com.huohaodong.lotus.predicate;
 
-public class RoutePredicate {
+import com.huohaodong.lotus.server.context.GatewayContext;
+
+import java.util.function.Predicate;
+
+public interface RoutePredicate extends Predicate<GatewayContext> {
 
 }
