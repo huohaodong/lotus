@@ -1,6 +1,6 @@
 package com.huohaodong.lotus.handler;
 
-import com.huohaodong.lotus.context.GatewayContext;
+import com.huohaodong.lotus.server.context.GatewayContext;
 import com.huohaodong.lotus.server.GatewayRequest;
 import com.huohaodong.lotus.server.GatewayResponse;
 import io.netty.channel.ChannelHandlerContext;

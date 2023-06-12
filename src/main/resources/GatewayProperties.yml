@@ -1,2 +1,24 @@
 host: "0.0.0.0"
 port: 10086
+routes:
+  - id: route1
+    uri: http://localhost:8081
+    order: 1
+    predicates:
+      - Path=/api/service1/**
+    filters:
+      - StripPrefix=1
+
+  - id: route2
+    uri: http://localhost:8082
+    order: 2
+    predicates:
+      - Path=/api/service2/**
+    filters:
+      - StripPrefix=1
+
+  - id: route3
+    uri: http:/fallback
+    order: 3
+    predicates:
+      - Path=/fallback/**

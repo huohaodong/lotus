@@ -1,6 +1,7 @@
 package com.huohaodong.lotus.filter;
 
-import com.huohaodong.lotus.context.GatewayContext;
+import com.huohaodong.lotus.server.context.GatewayContext;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -8,6 +9,7 @@ public class DefaultGatewayFilterChain implements GatewayFilterChain {
 
     private final int index;
 
+    @Getter
     private final List<GatewayFilter> filters;
 
     public DefaultGatewayFilterChain(List<GatewayFilter> filters) {
@@ -18,10 +20,6 @@ public class DefaultGatewayFilterChain implements GatewayFilterChain {
     private DefaultGatewayFilterChain(DefaultGatewayFilterChain parent, int index) {
         this.filters = parent.getFilters();
         this.index = index;
-    }
-
-    public List<GatewayFilter> getFilters() {
-        return filters;
     }
 
     @Override

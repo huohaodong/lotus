@@ -15,6 +15,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.timeout.IdleStateHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.asynchttpclient.DefaultAsyncHttpClientConfig;
@@ -22,6 +23,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.net.InetSocketAddress;
 
+@Slf4j
 public class GatewayBootstrap {
 
     private GatewayProperties gatewayProperties;
@@ -29,8 +31,6 @@ public class GatewayBootstrap {
     private EventLoopGroup bossEventLoopGroup;
 
     private EventLoopGroup workerEventLoopGroup;
-
-    private ServerBootstrap serverBootstrap;
 
     private AsyncHttpClient asyncHttpClient;
 
@@ -41,7 +41,7 @@ public class GatewayBootstrap {
     private void startGatewayServer() {
         bossEventLoopGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
         workerEventLoopGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
-        serverBootstrap = new ServerBootstrap()
+        ServerBootstrap serverBootstrap = new ServerBootstrap()
                 .group(bossEventLoopGroup, workerEventLoopGroup)
                 .channel(Epoll.isAvailable() ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<>() {
@@ -58,7 +58,7 @@ public class GatewayBootstrap {
             ChannelFuture channelFuture = serverBootstrap.bind(new InetSocketAddress(gatewayProperties.getHost(), gatewayProperties.getPort())).sync();
             channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error when init gateway", e);
         }
     }
 
@@ -89,7 +89,7 @@ public class GatewayBootstrap {
             workerEventLoopGroup.shutdownGracefully();
             asyncHttpClient.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error when shutdown gateway", e);
         }
     }
 }

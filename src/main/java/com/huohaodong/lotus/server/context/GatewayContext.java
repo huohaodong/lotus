@@ -1,4 +1,4 @@
-package com.huohaodong.lotus.context;
+package com.huohaodong.lotus.server.context;
 
 import com.huohaodong.lotus.server.GatewayRequest;
 import com.huohaodong.lotus.server.GatewayResponse;
