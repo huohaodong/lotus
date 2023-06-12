@@ -1,6 +1,7 @@
 package com.huohaodong.lotus.server;
 
 import cn.hutool.core.text.AntPathMatcher;
+import com.huohaodong.lotus.server.properties.GatewayProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.Yaml;

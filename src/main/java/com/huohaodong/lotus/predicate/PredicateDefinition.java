@@ -1,15 +1,18 @@
 package com.huohaodong.lotus.predicate;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PredicateDefinition {
 
-    private String name;
+    private String type;
 
-    private Map<String, String> args = new LinkedHashMap<>();
+    private String args;
 
 }

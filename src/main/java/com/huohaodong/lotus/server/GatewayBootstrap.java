@@ -1,6 +1,8 @@
 package com.huohaodong.lotus.server;
 
 import com.huohaodong.lotus.handler.GatewayRequestHandler;
+import com.huohaodong.lotus.route.RouteDefinition;
+import com.huohaodong.lotus.server.properties.GatewayProperties;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -22,6 +24,7 @@ import org.asynchttpclient.DefaultAsyncHttpClientConfig;
 import org.yaml.snakeyaml.Yaml;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 @Slf4j
 public class GatewayBootstrap {
@@ -35,7 +38,13 @@ public class GatewayBootstrap {
     private AsyncHttpClient asyncHttpClient;
 
     private void loadGatewayProperties() {
+        // YAML -> Object
         gatewayProperties = new Yaml().loadAs(this.getClass().getClassLoader().getResourceAsStream("GatewayProperties.yml"), GatewayProperties.class);
+        // Object -> Route Definition (Filter Definition + Predicate Definition + uri + order + id)
+        List<RouteDefinition> routeDefinitions = gatewayProperties.populate();
+        log.info("load Route Definitions: {}, from GatewayProperties.yml: ", routeDefinitions);
+
+        //
     }
 
     private void startGatewayServer() {

@@ -1,15 +1,16 @@
 package com.huohaodong.lotus.filter;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class FilterDefinition {
 
-    private String name;
+    private String type;
 
-    private Map<String, String> args = new LinkedHashMap<>();
+    private String args;
 
 }
