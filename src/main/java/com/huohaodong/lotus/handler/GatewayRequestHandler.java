@@ -1,5 +1,6 @@
 package com.huohaodong.lotus.handler;
 
+import com.huohaodong.lotus.route.Route;
 import com.huohaodong.lotus.server.context.GatewayContext;
 import com.huohaodong.lotus.server.GatewayRequest;
 import com.huohaodong.lotus.server.GatewayResponse;
@@ -12,9 +13,12 @@ import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.util.Optional;
 
 @Slf4j
 public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+
+    private final GatewayRouter router = GatewayRouter.getInstance();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
@@ -26,9 +30,8 @@ public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpR
         String clientIp = remoteAddress.getAddress().getHostAddress();
         gatewayContext.attributes().put(GatewayContextAttributes.CLIENT_IP, clientIp);
         // 1. 根据客户端发来的 HTTP 请求匹配对应的 Route，根据 Route 构造 GatewayContext
-        // TODO: 实现 Route 配置信息的读取已经 Route 信息中 Filter 和 Predicate 的构造，然后通过一个 handler 类来获取对应的映射信息
+        Optional<Route> route = router.route(gatewayContext);
         // 2. 根据客户端发来的 HTTP 请求信息或根据 Route 中的信息从缓存中获取或新构造 GatewayFilterChain
-
         // 3. GatewayFilterChain.filter(GatewayContext)
     }
 

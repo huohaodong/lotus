@@ -1,7 +1,7 @@
 package com.huohaodong.lotus.server;
 
 import com.huohaodong.lotus.handler.GatewayRequestHandler;
-import com.huohaodong.lotus.route.Route;
+import com.huohaodong.lotus.handler.GatewayRouter;
 import com.huohaodong.lotus.route.RouteDefinition;
 import com.huohaodong.lotus.server.properties.GatewayProperties;
 import io.netty.bootstrap.ServerBootstrap;
@@ -44,7 +44,8 @@ public class GatewayBootstrap {
         // Object -> Route Definition (Filter Definition + Predicate Definition + uri + order + id)
         List<RouteDefinition> routeDefinitions = gatewayProperties.populate();
         log.info("load Route Definitions: {}, from GatewayProperties.yml: ", routeDefinitions);
-        // TODO: Route Definition -> Route
+        // Route Definition -> GatewayRouter
+        GatewayRouter.getInstance().refresh(routeDefinitions);
 
     }
 
