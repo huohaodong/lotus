@@ -1,13 +1,10 @@
 package com.huohaodong.lotus.predicate;
 
-import com.huohaodong.lotus.predicate.RoutePredicate;
 import com.huohaodong.lotus.server.context.GatewayContext;
-import io.netty.handler.codec.http.HttpHeaders;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 
 public class HeaderRoutePredicate implements RoutePredicate {
 
