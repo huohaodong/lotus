@@ -11,7 +11,12 @@ public class CookieRoutePredicate implements RoutePredicate {
     private final Set<String> cookies = new HashSet<>();
 
     public CookieRoutePredicate(PredicateDefinition predicateDefinition) {
-        cookies.addAll(Arrays.asList(predicateDefinition.getArgs().split(",")));
+        String[] args = predicateDefinition.getArgs().split(",");
+        for (String arg : args) {
+            if (!arg.isEmpty()) {
+                cookies.add(arg);
+            }
+        }
     }
 
     @Override

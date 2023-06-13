@@ -5,6 +5,7 @@ import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import org.asynchttpclient.RequestBuilder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,17 +30,17 @@ public class GatewayRequest {
         this.requestBuilder = new RequestBuilder().setMethod(fullHttpRequest.method().name()).setQueryParams(queryStringDecoder.parameters()).setHeaders(fullHttpRequest.headers()).setBody(fullHttpRequest.content().nioBuffer());
     }
 
-    public FullHttpRequest getFullHttpRequest() {
-        return fullHttpRequest;
-    }
-
     public RequestBuilder builder() {
         return requestBuilder;
     }
 
     public Set<Cookie> cookies() {
         if (cookies == null) {
-            cookies = ServerCookieDecoder.STRICT.decode(headers().get(HttpHeaderNames.COOKIE));
+            if (headers().get(HttpHeaderNames.COOKIE) != null) {
+                cookies = ServerCookieDecoder.STRICT.decode(headers().get(HttpHeaderNames.COOKIE));
+            } else {
+                cookies = new HashSet<>();
+            }
         }
         return cookies;
     }
