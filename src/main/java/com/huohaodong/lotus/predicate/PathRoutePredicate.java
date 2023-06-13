@@ -1,11 +1,23 @@
 package com.huohaodong.lotus.predicate;
 
+import cn.hutool.core.text.AntPathMatcher;
 import com.huohaodong.lotus.server.context.GatewayContext;
 
 public class PathRoutePredicate implements RoutePredicate {
-    //TODO: 实现 PathRoutePredicate，路径匹配可以使用 AntPathMatcher
+
+    private static final AntPathMatcher INSTANCE = new AntPathMatcher();
+
+    private final AntPathMatcher matcher = PathRoutePredicate.INSTANCE;
+
+    private final String pattern;
+
+    public PathRoutePredicate(PredicateDefinition predicateDefinition) {
+        pattern = predicateDefinition.getArgs();
+    }
+
     @Override
     public boolean test(GatewayContext gatewayContext) {
-        return false;
+        return matcher.match(pattern, gatewayContext.getRequest().path());
     }
+
 }
