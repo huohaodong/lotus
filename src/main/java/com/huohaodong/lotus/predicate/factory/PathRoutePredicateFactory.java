@@ -1,5 +1,6 @@
 package com.huohaodong.lotus.predicate.factory;
 
+import com.huohaodong.lotus.predicate.PathRoutePredicate;
 import com.huohaodong.lotus.predicate.PredicateDefinition;
 import com.huohaodong.lotus.predicate.RoutePredicate;
 
@@ -13,7 +14,7 @@ public class PathRoutePredicateFactory implements RoutePredicateFactory {
 
     @Override
     public RoutePredicate createRoutePredicate(PredicateDefinition predicateDefinition) {
-        return null;
+        return new PathRoutePredicate(predicateDefinition);
     }
 
     private static class SingletonHolder {
