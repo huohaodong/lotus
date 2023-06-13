@@ -18,12 +18,8 @@ routes:
     uri: http://localhost:8082
     order: 2
     predicates:
+      - Method=POST,GET
       - Path=/api/service2/**
-    filters:
-      - StripPrefix=1
-
-  - id: route3
-    uri: http:/fallback
-    order: 3
-    predicates:
-      - Path=/fallback/**
+      - Cookie=key1,value1
+      - Query=q1,q2
+      - Header=h1,h2

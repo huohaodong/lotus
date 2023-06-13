@@ -16,6 +16,7 @@ public class HeaderRoutePredicate implements RoutePredicate {
 
     @Override
     public boolean test(GatewayContext gatewayContext) {
-        return headers.stream().anyMatch(header -> gatewayContext.getRequest().headers().contains(header));
+        // TODO 重写 header 逻辑
+        return headers.stream().allMatch(header -> gatewayContext.getRequest().headers().contains(header));
     }
 }
