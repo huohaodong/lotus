@@ -2,21 +2,16 @@ package com.huohaodong.lotus.predicate;
 
 import com.huohaodong.lotus.server.context.GatewayContext;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Objects;
 
-public class HeaderRoutePredicate implements RoutePredicate {
-
-    private final Set<String> headers = new HashSet<>();
+public class HeaderRoutePredicate extends SimpleKeyValuePredicate {
 
     public HeaderRoutePredicate(PredicateDefinition predicateDefinition) {
-        headers.addAll(Arrays.asList(predicateDefinition.getArgs().split(",")));
+        super(predicateDefinition);
     }
 
     @Override
     public boolean test(GatewayContext gatewayContext) {
-        // TODO 重写 header 逻辑
-        return headers.stream().allMatch(header -> gatewayContext.getRequest().headers().contains(header));
+        return gatewayContext.getRequest().headers().contains(key()) && Objects.equals(gatewayContext.getRequest().headers().get(key()), value());
     }
 }

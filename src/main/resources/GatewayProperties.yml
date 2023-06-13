@@ -1,19 +1,18 @@
 host: 0.0.0.0
 port: 10086
 routes:
-  - id: route1
-    uri: http://localhost:8081
-    order: 1
-    predicates:
-      - Cookie=key1,key2
-      - Header=h1,h2
-      - Host=**.huohaodong.com:10086
-      - Path=/api/service1/**
-      - Method=POST
-      - Query=q1,12
-    filters:
-      - StripPrefix=1
-
+#  - id: route1
+#    uri: http://localhost:8081
+#    order: 1
+#    predicates:
+#      - Cookie=key1,key2
+#      - Header=h1,h2
+#      - Host=**.huohaodong.com:10086
+#      - Path=/api/service1/**
+#      - Method=POST
+#      - Query=q1,12
+#    filters:
+#      - StripPrefix=1
   - id: route2
     uri: http://localhost:8082
     order: 2
@@ -21,5 +20,6 @@ routes:
       - Method=POST,GET
       - Path=/api/service2/**
       - Cookie=key1,value1
-      - Query=q1,q2
+      - Query=q1,v1
+      - Query=q2,v2
       - Header=h1,h2
