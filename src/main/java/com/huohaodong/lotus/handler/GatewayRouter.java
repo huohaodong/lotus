@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GatewayRouter {
 
-    private RoutePredicateFactory routePredicateFactory = DefaultRoutePredicateFactory.getInstance();
+    private final RoutePredicateFactory routePredicateFactory = DefaultRoutePredicateFactory.getInstance();
+
     private List<Route> routes = new ArrayList<>();
 
     private GatewayRouter() {
