@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FilterDefinition {
 
-    private String type;
+    private String name;
 
     private String args;
 

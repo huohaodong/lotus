@@ -23,3 +23,6 @@ routes:
       - Query=q1,v1
       - Query=q2,v2
       - Header=h1,h2
+    filters:
+      - Auth=Authorization
+      - TokenBucketRateLimiter=param1,param2,param3
