@@ -8,7 +8,6 @@ import lombok.Data;
 import java.net.URI;
 import java.util.List;
 
-
 @Data
 public class Route implements Comparable<Route> {
 

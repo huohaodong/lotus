@@ -4,6 +4,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import org.asynchttpclient.RequestBuilder;
+import org.asynchttpclient.uri.Uri;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +28,11 @@ public class GatewayRequest {
     public GatewayRequest(FullHttpRequest fullHttpRequest) {
         this.fullHttpRequest = fullHttpRequest;
         this.queryStringDecoder = new QueryStringDecoder(fullHttpRequest.uri());
-        this.requestBuilder = new RequestBuilder().setMethod(fullHttpRequest.method().name()).setQueryParams(queryStringDecoder.parameters()).setHeaders(fullHttpRequest.headers()).setBody(fullHttpRequest.content().nioBuffer());
+        this.requestBuilder = new RequestBuilder()
+                .setMethod(fullHttpRequest.method().name())
+                .setQueryParams(queryStringDecoder.parameters())
+                .setHeaders(fullHttpRequest.headers())
+                .setBody(fullHttpRequest.content().nioBuffer());
     }
 
     public RequestBuilder builder() {
@@ -64,5 +69,4 @@ public class GatewayRequest {
     public String host() {
         return headers().get(HttpHeaderNames.HOST);
     }
-
 }

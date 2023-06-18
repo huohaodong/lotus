@@ -4,23 +4,21 @@ import org.asynchttpclient.AsyncHttpClient;
 
 public class GatewayHttpClient {
 
+    private static GatewayHttpClient INSTANCE = new GatewayHttpClient();
+
     private AsyncHttpClient asyncHttpClient;
 
     private GatewayHttpClient() {}
 
     public static GatewayHttpClient getInstance() {
-        return SingletonHolder.INSTANCE;
+        return INSTANCE;
     }
 
     public AsyncHttpClient client() {
-        return asyncHttpClient;
+        return INSTANCE.asyncHttpClient;
     }
 
     public void setClient(AsyncHttpClient client) {
-        this.asyncHttpClient = client;
-    }
-
-    private static class SingletonHolder {
-        private static final GatewayHttpClient INSTANCE = new GatewayHttpClient();
+        INSTANCE.asyncHttpClient = client;
     }
 }

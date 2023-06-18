@@ -90,8 +90,8 @@ public class GatewayBootstrap {
 
     public void start() {
         loadGatewayProperties();
-        startGatewayServer();
         startGatewayHttpClient();
+        startGatewayServer();
     }
 
     public void shutdown() {

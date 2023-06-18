@@ -11,7 +11,7 @@ public class GatewayResponse {
 
     public class GatewayResponseBuilder {
 
-        private HttpHeaders responseHeaders = EmptyHttpHeaders.INSTANCE;
+        private HttpHeaders responseHeaders = new DefaultHttpHeaders();
 
         private HttpResponseStatus responseStatus;
 
@@ -20,7 +20,7 @@ public class GatewayResponse {
         private HttpVersion httpVersion;
 
         public GatewayResponseBuilder headers(HttpHeaders headers) {
-            responseHeaders.add(headers);
+            responseHeaders.set(headers);
             return this;
         }
 
@@ -41,7 +41,7 @@ public class GatewayResponse {
 
         public FullHttpResponse build() {
             FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(httpVersion, responseStatus, Unpooled.wrappedBuffer(responseContent.getBytes()));
-            fullHttpResponse.headers().add(responseHeaders);
+            fullHttpResponse.headers().set(responseHeaders);
             return fullHttpResponse;
         }
 

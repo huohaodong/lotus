@@ -1,9 +1,7 @@
 package com.huohaodong.lotus.handler;
 
 import com.huohaodong.lotus.filter.DefaultGatewayFilterChain;
-import com.huohaodong.lotus.filter.GatewayFilterChain;
 import com.huohaodong.lotus.route.Route;
-import com.huohaodong.lotus.server.GatewayBootstrap;
 import com.huohaodong.lotus.server.GatewayHttpClient;
 import com.huohaodong.lotus.server.GatewayRequest;
 import com.huohaodong.lotus.server.GatewayResponse;
@@ -23,7 +21,6 @@ import org.asynchttpclient.Response;
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 
 @Slf4j
 public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -43,36 +40,51 @@ public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpR
         gatewayContext.attributes().put(GatewayContextAttributes.CLIENT_IP, clientIp);
         // 1. 根据客户端发来的 HTTP 请求匹配对应的 Route
         Optional<Route> route = router.route(gatewayContext);
+        boolean isKeepAlive = HttpUtil.isKeepAlive(msg);
         // 2. 根据匹配到的 Route 信息从缓存中获取或新构造 GatewayFilterChain
         route.ifPresentOrElse(r -> {
                     // 3. GatewayFilterChain.filter(GatewayContext)
                     new DefaultGatewayFilterChain(r.getFilters()).filter(gatewayContext);
                 },
                 () -> {
-                    if (HttpUtil.isKeepAlive(msg)) {
+                    if (isKeepAlive) {
                         ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(),
                                 HttpResponseStatus.NOT_FOUND,
                                 Unpooled.wrappedBuffer("404 Not Found".getBytes())));
                     } else {
                         ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(),
-                                HttpResponseStatus.NOT_FOUND,
-                                Unpooled.wrappedBuffer("404 Not Found".getBytes())))
+                                        HttpResponseStatus.NOT_FOUND,
+                                        Unpooled.wrappedBuffer("404 Not Found".getBytes())))
                                 .addListener(ChannelFutureListener.CLOSE);
                     }
                 });
         // 4. 过滤后的请求转发给 Async Http Client 进行转发与响应
-        CompletableFuture<Response> future = client.executeRequest(gatewayContext.getRequest().builder()).toCompletableFuture();
+        CompletableFuture<Response> future = client.executeRequest(gatewayContext.getRequest().builder().setUrl(String.valueOf(route.get().getUri())))
+                .toCompletableFuture();
         future.whenComplete((response, throwable) -> {
-            FullHttpResponse fullHttpResponse = gatewayContext.getResponse().builder()
-                    .headers(response.getHeaders())
-                    .httpVersion(HttpVersion.HTTP_1_1)
-                    .status(HttpResponseStatus.valueOf(response.getStatusCode()))
-                    .content(response.getResponseBody())
-                    .build();
-            if (HttpUtil.isKeepAlive(msg)) {
-                ctx.writeAndFlush(fullHttpResponse);
+            if (response == null) {
+                if (isKeepAlive) {
+                    ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(),
+                            HttpResponseStatus.NOT_FOUND,
+                            Unpooled.wrappedBuffer("404 Not Found".getBytes())));
+                } else {
+                    ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(),
+                                    HttpResponseStatus.NOT_FOUND,
+                                    Unpooled.wrappedBuffer("404 Not Found".getBytes())))
+                            .addListener(ChannelFutureListener.CLOSE);
+                }
             } else {
-                ctx.writeAndFlush(fullHttpResponse);
+                FullHttpResponse fullHttpResponse = gatewayContext.getResponse().builder()
+                        .headers(response.getHeaders())
+                        .httpVersion(HttpVersion.HTTP_1_1)
+                        .status(HttpResponseStatus.valueOf(response.getStatusCode()))
+                        .content(response.getResponseBody())
+                        .build();
+                if (isKeepAlive) {
+                    ctx.writeAndFlush(fullHttpResponse);
+                } else {
+                    ctx.writeAndFlush(fullHttpResponse).addListener(ChannelFutureListener.CLOSE);
+                }
             }
         });
     }
