@@ -1,6 +1,9 @@
 package com.huohaodong.lotus.handler;
 
+import com.huohaodong.lotus.filter.FilterDefinition;
 import com.huohaodong.lotus.filter.GatewayFilter;
+import com.huohaodong.lotus.filter.GatewayFilterManager;
+import com.huohaodong.lotus.filter.factory.GatewayFilterFactory;
 import com.huohaodong.lotus.predicate.RoutePredicate;
 import com.huohaodong.lotus.predicate.factory.DefaultRoutePredicateFactory;
 import com.huohaodong.lotus.predicate.factory.RoutePredicateFactory;
@@ -12,12 +15,15 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class GatewayRouter {
 
     private final RoutePredicateFactory routePredicateFactory = DefaultRoutePredicateFactory.getInstance();
+
+    private final GatewayFilterManager gatewayFilterManager = GatewayFilterManager.getInstance();
 
     private List<Route> routes = new ArrayList<>();
 
@@ -44,8 +50,7 @@ public class GatewayRouter {
                     .collect(Collectors.toList());
 
             // TODO: 根据 RouteDefinition 构造对应的 GatewayFilter
-            List<GatewayFilter> filters = new ArrayList<>();
-
+            List<GatewayFilter> filters = routeDefinition.getFilters().stream().map(gatewayFilterManager::get).toList();
             return new Route(routeDefinition.getId(), routeDefinition.getUri(), routeDefinition.getOrder(), predicates, filters);
         }).sorted().collect(Collectors.toCollection(ArrayList::new));
         log.info("Router refreshed with total {} Routes", routes.size());

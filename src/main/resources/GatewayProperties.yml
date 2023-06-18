@@ -25,4 +25,8 @@ routes:
       - Header=h1,h2
     filters:
       - Auth=Authorization
-      - TokenBucketRateLimiter=param1,param2,param3
+  - id: route3
+    uri: http://localhost:7777/ping
+    order: 1
+    predicates:
+      - Method=POST,GET

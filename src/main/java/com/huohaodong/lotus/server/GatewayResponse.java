@@ -9,13 +9,15 @@ public class GatewayResponse {
         return new GatewayResponseBuilder();
     }
 
-    private static class GatewayResponseBuilder {
+    public class GatewayResponseBuilder {
 
         private HttpHeaders responseHeaders = EmptyHttpHeaders.INSTANCE;
 
         private HttpResponseStatus responseStatus;
 
         private String responseContent;
+
+        private HttpVersion httpVersion;
 
         public GatewayResponseBuilder headers(HttpHeaders headers) {
             responseHeaders.add(headers);
@@ -32,8 +34,13 @@ public class GatewayResponse {
             return this;
         }
 
+        public GatewayResponseBuilder httpVersion(HttpVersion version) {
+            httpVersion = version;
+            return this;
+        }
+
         public FullHttpResponse build() {
-            FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus, Unpooled.wrappedBuffer(responseContent.getBytes()));
+            FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(httpVersion, responseStatus, Unpooled.wrappedBuffer(responseContent.getBytes()));
             fullHttpResponse.headers().add(responseHeaders);
             return fullHttpResponse;
         }

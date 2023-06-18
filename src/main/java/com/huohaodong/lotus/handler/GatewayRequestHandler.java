@@ -1,28 +1,36 @@
 package com.huohaodong.lotus.handler;
 
+import com.huohaodong.lotus.filter.DefaultGatewayFilterChain;
+import com.huohaodong.lotus.filter.GatewayFilterChain;
 import com.huohaodong.lotus.route.Route;
-import com.huohaodong.lotus.server.context.GatewayContext;
+import com.huohaodong.lotus.server.GatewayBootstrap;
+import com.huohaodong.lotus.server.GatewayHttpClient;
 import com.huohaodong.lotus.server.GatewayRequest;
 import com.huohaodong.lotus.server.GatewayResponse;
+import com.huohaodong.lotus.server.context.GatewayContext;
 import com.huohaodong.lotus.server.context.GatewayContextAttributes;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Response;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 @Slf4j
 public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private final GatewayRouter router = GatewayRouter.getInstance();
+
+    private final AsyncHttpClient client = GatewayHttpClient.getInstance().client();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
@@ -36,11 +44,37 @@ public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpR
         // 1. 根据客户端发来的 HTTP 请求匹配对应的 Route
         Optional<Route> route = router.route(gatewayContext);
         // 2. 根据匹配到的 Route 信息从缓存中获取或新构造 GatewayFilterChain
-        // 3. GatewayFilterChain.filter(GatewayContext)
+        route.ifPresentOrElse(r -> {
+                    // 3. GatewayFilterChain.filter(GatewayContext)
+                    new DefaultGatewayFilterChain(r.getFilters()).filter(gatewayContext);
+                },
+                () -> {
+                    if (HttpUtil.isKeepAlive(msg)) {
+                        ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(),
+                                HttpResponseStatus.NOT_FOUND,
+                                Unpooled.wrappedBuffer("404 Not Found".getBytes())));
+                    } else {
+                        ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(),
+                                HttpResponseStatus.NOT_FOUND,
+                                Unpooled.wrappedBuffer("404 Not Found".getBytes())))
+                                .addListener(ChannelFutureListener.CLOSE);
+                    }
+                });
         // 4. 过滤后的请求转发给 Async Http Client 进行转发与响应
-        System.out.println(route);
-        // TODO: 目前不做转发，默认返回 OK，方便调试，完成转发逻辑后移除
-        ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(), HttpResponseStatus.OK, Unpooled.wrappedBuffer("lotus gateway".getBytes()))).addListener(ChannelFutureListener.CLOSE);
+        CompletableFuture<Response> future = client.executeRequest(gatewayContext.getRequest().builder()).toCompletableFuture();
+        future.whenComplete((response, throwable) -> {
+            FullHttpResponse fullHttpResponse = gatewayContext.getResponse().builder()
+                    .headers(response.getHeaders())
+                    .httpVersion(HttpVersion.HTTP_1_1)
+                    .status(HttpResponseStatus.valueOf(response.getStatusCode()))
+                    .content(response.getResponseBody())
+                    .build();
+            if (HttpUtil.isKeepAlive(msg)) {
+                ctx.writeAndFlush(fullHttpResponse);
+            } else {
+                ctx.writeAndFlush(fullHttpResponse);
+            }
+        });
     }
 
     @Override

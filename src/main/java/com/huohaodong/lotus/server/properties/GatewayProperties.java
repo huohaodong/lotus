@@ -58,25 +58,19 @@ public class GatewayProperties {
             routeDefinition.setId(routeProperties.getId());
             routeDefinition.setUri(routeProperties.getUri());
             routeDefinition.setOrder(routeProperties.getOrder());
-            List<PredicateDefinition> predicateDefinitions = routeProperties.getPredicates().stream().map(new Function<String, PredicateDefinition>() {
-                @Override
-                public PredicateDefinition apply(String s) {
-                    int eqIndex = s.indexOf("=");
-                    if (eqIndex <= 0) {
-                        log.error("Unable to parse RouteDefinition for '" + s + "', must in the form of key=value");
-                    }
-                    return new PredicateDefinition(s.substring(0, eqIndex), s.substring(eqIndex + 1));
+            List<PredicateDefinition> predicateDefinitions = routeProperties.getPredicates().stream().map(s -> {
+                int eqIndex = s.indexOf("=");
+                if (eqIndex <= 0) {
+                    log.error("Unable to parse RouteDefinition for '" + s + "', must in the form of key=value");
                 }
+                return new PredicateDefinition(s.substring(0, eqIndex), s.substring(eqIndex + 1));
             }).toList();
-            List<FilterDefinition> filterDefinitions = routeProperties.getFilters().stream().map(new Function<String, FilterDefinition>() {
-                @Override
-                public FilterDefinition apply(String s) {
-                    int eqIndex = s.indexOf("=");
-                    if (eqIndex <= 0) {
-                        log.error("Unable to parse RouteDefinition for '" + s + "', must in the form of key=value");
-                    }
-                    return new FilterDefinition(s.substring(0, eqIndex), s.substring(eqIndex + 1));
+            List<FilterDefinition> filterDefinitions = routeProperties.getFilters().stream().map(s -> {
+                int eqIndex = s.indexOf("=");
+                if (eqIndex <= 0) {
+                    log.error("Unable to parse RouteDefinition for '" + s + "', must in the form of key=value");
                 }
+                return new FilterDefinition(s.substring(0, eqIndex), s.substring(eqIndex + 1));
             }).toList();
             routeDefinition.setPredicates(predicateDefinitions);
             routeDefinition.setFilters(filterDefinitions);

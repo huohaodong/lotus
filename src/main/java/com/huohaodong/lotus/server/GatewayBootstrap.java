@@ -46,7 +46,6 @@ public class GatewayBootstrap {
         log.info("load Route Definitions: {}, from GatewayProperties.yml: ", routeDefinitions);
         // Route Definition -> GatewayRouter
         GatewayRouter.getInstance().refresh(routeDefinitions);
-
     }
 
     private void startGatewayServer() {
@@ -86,6 +85,7 @@ public class GatewayBootstrap {
                 .setMaxConnectionsPerHost(gatewayProperties.getMaxConnectionsPerHost())
                 .setPooledConnectionIdleTimeout(gatewayProperties.getPooledConnectionIdleTimeout());
         this.asyncHttpClient = new DefaultAsyncHttpClient(builder.build());
+        GatewayHttpClient.getInstance().setClient(this.asyncHttpClient);
     }
 
     public void start() {
