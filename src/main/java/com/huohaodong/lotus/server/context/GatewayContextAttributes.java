@@ -14,5 +14,16 @@ public interface GatewayContextAttributes {
     /**
      * 上下文对应的 Route
      */
-    String ROUTE = "Route";
+    String ROUTE = "ROUTE";
+
+    /**
+     * FilterChain 执行结果
+     */
+    String FILTER_STATE = "FILTER_STATE";
+
+    enum FilterState {
+        ABORT_UNAUTHORIZED,
+        ABORT_TOO_MANY_REQUEST,
+        COMPLETE
+    }
 }
