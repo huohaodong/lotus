@@ -1,9 +1,7 @@
 package com.huohaodong.lotus.handler;
 
-import com.huohaodong.lotus.filter.FilterDefinition;
 import com.huohaodong.lotus.filter.GatewayFilter;
 import com.huohaodong.lotus.filter.GatewayFilterManager;
-import com.huohaodong.lotus.filter.factory.GatewayFilterFactory;
 import com.huohaodong.lotus.predicate.RoutePredicate;
 import com.huohaodong.lotus.predicate.factory.DefaultRoutePredicateFactory;
 import com.huohaodong.lotus.predicate.factory.RoutePredicateFactory;
@@ -15,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
