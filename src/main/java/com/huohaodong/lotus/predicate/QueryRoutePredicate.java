@@ -13,6 +13,6 @@ public class QueryRoutePredicate extends SimpleKeyValuePredicate {
     @Override
     public boolean test(GatewayContext gatewayContext) {
         List<String> queries = gatewayContext.getRequest().queryParameters().get(key());
-        return queries.contains(value());
+        return queries != null && queries.contains(value());
     }
 }

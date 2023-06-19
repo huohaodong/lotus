@@ -7,6 +7,7 @@ import com.huohaodong.lotus.server.GatewayRequest;
 import com.huohaodong.lotus.server.GatewayResponse;
 import com.huohaodong.lotus.server.context.GatewayContext;
 import com.huohaodong.lotus.server.context.GatewayContextAttributes;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,6 +20,7 @@ import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Response;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,55 +40,48 @@ public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpR
         InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
         String clientIp = remoteAddress.getAddress().getHostAddress();
         gatewayContext.attributes().put(GatewayContextAttributes.CLIENT_IP, clientIp);
+        boolean isKeepAlive = HttpUtil.isKeepAlive(msg);
+        gatewayContext.attributes().put(GatewayContextAttributes.KEEP_ALIVE, isKeepAlive);
         // 1. 根据客户端发来的 HTTP 请求匹配对应的 Route
         Optional<Route> route = router.route(gatewayContext);
-        boolean isKeepAlive = HttpUtil.isKeepAlive(msg);
         // 2. 根据匹配到的 Route 信息从缓存中获取或新构造 GatewayFilterChain
-        route.ifPresentOrElse(r -> {
+        route.ifPresentOrElse(
+                r -> {
                     // 3. GatewayFilterChain.filter(GatewayContext)
                     new DefaultGatewayFilterChain(r.getFilters()).filter(gatewayContext);
+                    // 4. 过滤后的请求转发给 Async Http Client 进行转发与响应
+                    CompletableFuture<Response> future = client.executeRequest(gatewayContext.getRequest().builder().setUrl(String.valueOf(r.getUri())))
+                            .toCompletableFuture();
+                    future.whenComplete((response, throwable) -> {
+                        if (response == null) {
+                            if (isKeepAlive) {
+                                ctx.writeAndFlush(NOT_FOUND_RESPONSE());
+                            } else {
+                                ctx.writeAndFlush(NOT_FOUND_RESPONSE()).addListener(ChannelFutureListener.CLOSE);
+                            }
+                        } else {
+                            FullHttpResponse fullHttpResponse = gatewayContext.getResponse().builder()
+                                    .headers(response.getHeaders())
+                                    .httpVersion(HttpVersion.HTTP_1_1)
+                                    .status(HttpResponseStatus.valueOf(response.getStatusCode()))
+                                    .content(response.getResponseBody())
+                                    .build();
+                            if (isKeepAlive) {
+                                ctx.writeAndFlush(fullHttpResponse);
+                            } else {
+                                ctx.writeAndFlush(fullHttpResponse).addListener(ChannelFutureListener.CLOSE);
+                            }
+                        }
+                    });
                 },
                 () -> {
                     if (isKeepAlive) {
-                        ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(),
-                                HttpResponseStatus.NOT_FOUND,
-                                Unpooled.wrappedBuffer("404 Not Found".getBytes())));
+                        ctx.writeAndFlush(NOT_FOUND_RESPONSE());
                     } else {
-                        ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(),
-                                        HttpResponseStatus.NOT_FOUND,
-                                        Unpooled.wrappedBuffer("404 Not Found".getBytes())))
-                                .addListener(ChannelFutureListener.CLOSE);
+                        ctx.writeAndFlush(NOT_FOUND_RESPONSE()).addListener(ChannelFutureListener.CLOSE);
                     }
-                });
-        // 4. 过滤后的请求转发给 Async Http Client 进行转发与响应
-        CompletableFuture<Response> future = client.executeRequest(gatewayContext.getRequest().builder().setUrl(String.valueOf(route.get().getUri())))
-                .toCompletableFuture();
-        future.whenComplete((response, throwable) -> {
-            if (response == null) {
-                if (isKeepAlive) {
-                    ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(),
-                            HttpResponseStatus.NOT_FOUND,
-                            Unpooled.wrappedBuffer("404 Not Found".getBytes())));
-                } else {
-                    ctx.writeAndFlush(new DefaultFullHttpResponse(msg.protocolVersion(),
-                                    HttpResponseStatus.NOT_FOUND,
-                                    Unpooled.wrappedBuffer("404 Not Found".getBytes())))
-                            .addListener(ChannelFutureListener.CLOSE);
                 }
-            } else {
-                FullHttpResponse fullHttpResponse = gatewayContext.getResponse().builder()
-                        .headers(response.getHeaders())
-                        .httpVersion(HttpVersion.HTTP_1_1)
-                        .status(HttpResponseStatus.valueOf(response.getStatusCode()))
-                        .content(response.getResponseBody())
-                        .build();
-                if (isKeepAlive) {
-                    ctx.writeAndFlush(fullHttpResponse);
-                } else {
-                    ctx.writeAndFlush(fullHttpResponse).addListener(ChannelFutureListener.CLOSE);
-                }
-            }
-        });
+        );
     }
 
     @Override
@@ -97,5 +92,11 @@ public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpR
             }
         }
         ctx.fireUserEventTriggered(evt);
+    }
+
+    public static FullHttpResponse NOT_FOUND_RESPONSE() {
+        return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                HttpResponseStatus.NOT_FOUND,
+                Unpooled.wrappedBuffer("404 Not Found".getBytes()));
     }
 }

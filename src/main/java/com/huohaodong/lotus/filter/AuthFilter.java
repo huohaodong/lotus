@@ -20,6 +20,7 @@ public class AuthFilter implements GatewayFilter, Ordered {
         for (String token : tokens) {
             if (context.getRequest().headers().contains(token)) {
                 chain.filter(context);
+                break;
             }
         }
     }
