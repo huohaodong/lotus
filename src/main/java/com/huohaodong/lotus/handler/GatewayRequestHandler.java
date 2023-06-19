@@ -58,9 +58,19 @@ public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpR
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent event) {
             if (event.state().equals(IdleState.ALL_IDLE)) {
+                InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+                String clientIp = remoteAddress.getAddress().getHostAddress();
+                log.info("Close client connection for {}, caused by heartbeat timeout", clientIp);
                 ctx.channel().close();
             }
         }
-        ctx.fireUserEventTriggered(evt);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+        String clientIp = remoteAddress.getAddress().getHostAddress();
+        log.info("Close client connection for {}, caused by {}", clientIp, cause.toString());
+        ctx.channel().close();
     }
 }
