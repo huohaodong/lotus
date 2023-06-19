@@ -14,7 +14,6 @@ import org.asynchttpclient.Response;
 
 import java.util.concurrent.CompletableFuture;
 
-// TODO: 通过 Route Filter 调用 HttpClient 来转发请求
 public class RouteFilter implements GatewayFilter {
 
     private RouteFilter() {
@@ -34,7 +33,7 @@ public class RouteFilter implements GatewayFilter {
     public void filter(GatewayContext context, GatewayFilterChain chain) {
         Route route = (Route) context.attributes().get(GatewayContextAttributes.ROUTE);
         boolean isKeepAlive = (Boolean) context.attributes().getOrDefault(GatewayContextAttributes.KEEP_ALIVE, false);
-        // 4. 过滤后的请求转发给 Async Http Client 进行转发与响应
+        // 过滤完成后的请求转发给 Async Http Client 进行转发与响应
         CompletableFuture<Response> future = GatewayBootstrap.asyncHttpClient.executeRequest(context.getRequest().builder().setUrl(String.valueOf(route.getUri())))
                 .toCompletableFuture();
         future.whenComplete((response, throwable) -> {
