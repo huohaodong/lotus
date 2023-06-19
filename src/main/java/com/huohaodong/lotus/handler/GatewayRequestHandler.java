@@ -7,7 +7,6 @@ import com.huohaodong.lotus.server.GatewayRequest;
 import com.huohaodong.lotus.server.GatewayResponse;
 import com.huohaodong.lotus.server.context.GatewayContext;
 import com.huohaodong.lotus.server.context.GatewayContextAttributes;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,7 +19,6 @@ import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Response;
 
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 

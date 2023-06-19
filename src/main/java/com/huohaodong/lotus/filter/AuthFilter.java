@@ -17,11 +17,8 @@ public class AuthFilter implements GatewayFilter, Ordered {
 
     @Override
     public void filter(GatewayContext context, GatewayFilterChain chain) {
-        for (String token : tokens) {
-            if (context.getRequest().headers().contains(token)) {
-                chain.filter(context);
-                break;
-            }
+        if (tokens.stream().anyMatch(token -> context.getRequest().headers().contains(token))) {
+            chain.filter(context);
         }
     }
 
