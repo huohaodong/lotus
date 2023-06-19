@@ -1,7 +1,7 @@
 package com.huohaodong.lotus.filter;
 
 import com.huohaodong.lotus.route.Route;
-import com.huohaodong.lotus.server.GatewayHttpClient;
+import com.huohaodong.lotus.server.GatewayBootstrap;
 import com.huohaodong.lotus.server.context.GatewayContext;
 import com.huohaodong.lotus.server.context.GatewayContextAttributes;
 import io.netty.buffer.Unpooled;
@@ -10,15 +10,12 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Response;
 
 import java.util.concurrent.CompletableFuture;
 
 // TODO: 通过 Route Filter 调用 HttpClient 来转发请求
 public class RouteFilter implements GatewayFilter {
-
-    private final AsyncHttpClient client = GatewayHttpClient.getInstance().client();
 
     private RouteFilter() {
     }
@@ -38,7 +35,7 @@ public class RouteFilter implements GatewayFilter {
         Route route = (Route) context.attributes().get(GatewayContextAttributes.ROUTE);
         boolean isKeepAlive = (Boolean) context.attributes().getOrDefault(GatewayContextAttributes.KEEP_ALIVE, false);
         // 4. 过滤后的请求转发给 Async Http Client 进行转发与响应
-        CompletableFuture<Response> future = client.executeRequest(context.getRequest().builder().setUrl(String.valueOf(route.getUri())))
+        CompletableFuture<Response> future = GatewayBootstrap.asyncHttpClient.executeRequest(context.getRequest().builder().setUrl(String.valueOf(route.getUri())))
                 .toCompletableFuture();
         future.whenComplete((response, throwable) -> {
             if (response == null) {

@@ -30,17 +30,14 @@ import java.util.List;
 @Slf4j
 public class GatewayBootstrap {
 
-    private GatewayProperties gatewayProperties;
+    public static GatewayProperties gatewayProperties;
+    public static AsyncHttpClient asyncHttpClient;
+    private static EventLoopGroup bossEventLoopGroup;
+    private static EventLoopGroup workerEventLoopGroup;
 
-    private EventLoopGroup bossEventLoopGroup;
-
-    private EventLoopGroup workerEventLoopGroup;
-
-    private AsyncHttpClient asyncHttpClient;
-
-    private void loadGatewayProperties() {
+    private static void loadGatewayProperties() {
         // YAML -> Object
-        gatewayProperties = new Yaml().loadAs(this.getClass().getClassLoader().getResourceAsStream("GatewayProperties.yml"), GatewayProperties.class);
+        gatewayProperties = new Yaml().loadAs(GatewayBootstrap.class.getClassLoader().getResourceAsStream("GatewayProperties.yml"), GatewayProperties.class);
         // Object -> Route Definition (Filter Definition + Predicate Definition + uri + order + id)
         List<RouteDefinition> routeDefinitions = gatewayProperties.populate();
         log.info("load Route Definitions: {}, from GatewayProperties.yml: ", routeDefinitions);
@@ -48,7 +45,7 @@ public class GatewayBootstrap {
         GatewayRouter.getInstance().refresh(routeDefinitions);
     }
 
-    private void startGatewayServer() {
+    private static void startGatewayServer() {
         bossEventLoopGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
         workerEventLoopGroup = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
         ServerBootstrap serverBootstrap = new ServerBootstrap()
@@ -72,7 +69,7 @@ public class GatewayBootstrap {
         }
     }
 
-    private void startGatewayHttpClient() {
+    private static void startGatewayHttpClient() {
         DefaultAsyncHttpClientConfig.Builder builder = new DefaultAsyncHttpClientConfig.Builder()
                 .setEventLoopGroup(workerEventLoopGroup)
                 .setConnectTimeout(gatewayProperties.getConnectTimeout())
@@ -84,17 +81,16 @@ public class GatewayBootstrap {
                 .setMaxConnections(gatewayProperties.getMaxConnections())
                 .setMaxConnectionsPerHost(gatewayProperties.getMaxConnectionsPerHost())
                 .setPooledConnectionIdleTimeout(gatewayProperties.getPooledConnectionIdleTimeout());
-        this.asyncHttpClient = new DefaultAsyncHttpClient(builder.build());
-        GatewayHttpClient.getInstance().setClient(this.asyncHttpClient);
+        asyncHttpClient = new DefaultAsyncHttpClient(builder.build());
     }
 
-    public void start() {
+    public static void start() {
         loadGatewayProperties();
         startGatewayHttpClient();
         startGatewayServer();
     }
 
-    public void shutdown() {
+    public static void shutdown() {
         try {
             bossEventLoopGroup.shutdownGracefully();
             workerEventLoopGroup.shutdownGracefully();
