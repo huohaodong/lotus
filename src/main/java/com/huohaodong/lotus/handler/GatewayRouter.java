@@ -2,6 +2,7 @@ package com.huohaodong.lotus.handler;
 
 import com.huohaodong.lotus.filter.GatewayFilter;
 import com.huohaodong.lotus.filter.GatewayFilterManager;
+import com.huohaodong.lotus.filter.RouteFilter;
 import com.huohaodong.lotus.predicate.RoutePredicate;
 import com.huohaodong.lotus.predicate.factory.DefaultRoutePredicateFactory;
 import com.huohaodong.lotus.predicate.factory.RoutePredicateFactory;
@@ -45,9 +46,8 @@ public class GatewayRouter {
             List<RoutePredicate> predicates = routeDefinition.getPredicates().stream()
                     .map(routePredicateFactory::createRoutePredicate)
                     .collect(Collectors.toList());
-
-            // TODO: 根据 RouteDefinition 构造对应的 GatewayFilter
-            List<GatewayFilter> filters = routeDefinition.getFilters().stream().map(gatewayFilterManager::get).toList();
+            List<GatewayFilter> filters = routeDefinition.getFilters().stream().map(gatewayFilterManager::get).collect(Collectors.toCollection(ArrayList::new));
+            filters.add(RouteFilter.getInstance());
             return new Route(routeDefinition.getId(), routeDefinition.getUri(), routeDefinition.getOrder(), predicates, filters);
         }).sorted().collect(Collectors.toCollection(ArrayList::new));
         log.info("Router refreshed with total {} Routes", routes.size());

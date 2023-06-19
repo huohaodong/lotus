@@ -11,4 +11,8 @@ public interface GatewayContextAttributes {
      */
     String KEEP_ALIVE = "KEEP_ALIVE";
 
+    /**
+     * 上下文对应的 Route
+     */
+    String ROUTE = "Route";
 }

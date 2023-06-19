@@ -7,8 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AuthFilter implements GatewayFilter, Ordered {
-
+public class AuthFilter implements GatewayFilter {
     Set<String> tokens = new HashSet<>(List.of("Authorization"));
 
     public AuthFilter(FilterDefinition filterDefinition) {
@@ -20,10 +19,5 @@ public class AuthFilter implements GatewayFilter, Ordered {
         if (tokens.stream().anyMatch(token -> context.getRequest().headers().contains(token))) {
             chain.filter(context);
         }
-    }
-
-    @Override
-    public int getOrder() {
-        return -1;
     }
 }

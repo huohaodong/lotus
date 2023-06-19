@@ -4,7 +4,7 @@ import org.asynchttpclient.AsyncHttpClient;
 
 public class GatewayHttpClient {
 
-    private static GatewayHttpClient INSTANCE = new GatewayHttpClient();
+    private static final GatewayHttpClient INSTANCE = new GatewayHttpClient();
 
     private AsyncHttpClient asyncHttpClient;
 
