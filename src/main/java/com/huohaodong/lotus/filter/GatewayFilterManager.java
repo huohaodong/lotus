@@ -1,14 +1,11 @@
 package com.huohaodong.lotus.filter;
 
-import com.huohaodong.lotus.filter.factory.AuthFilterFactory;
 import com.huohaodong.lotus.filter.factory.GatewayFilterFactory;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.huohaodong.lotus.filter.Constants.AUTH_FILTER;
 
 @Slf4j
 public class GatewayFilterManager {
@@ -26,6 +23,7 @@ public class GatewayFilterManager {
     private void loadFromSPI() {
         ServiceLoader<GatewayFilterFactory> filterFactories = ServiceLoader.load(GatewayFilterFactory.class);
         for (GatewayFilterFactory factory : filterFactories) {
+            log.info("Loader filter from spi: {}", factory.getName());
             factories.put(factory.getName(), factory);
         }
     }
