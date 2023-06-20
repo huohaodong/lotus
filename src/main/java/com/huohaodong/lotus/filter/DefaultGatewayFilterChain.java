@@ -1,6 +1,7 @@
 package com.huohaodong.lotus.filter;
 
 import com.huohaodong.lotus.server.context.GatewayContext;
+import com.huohaodong.lotus.server.context.GatewayContextAttributes;
 import lombok.Getter;
 
 import java.util.List;
@@ -28,6 +29,8 @@ public class DefaultGatewayFilterChain implements GatewayFilterChain {
             GatewayFilter filter = filters.get(this.index);
             DefaultGatewayFilterChain chain = new DefaultGatewayFilterChain(this, this.index + 1);
             filter.filter(ctx, chain);
+        } else {
+            ctx.attributes().put(GatewayContextAttributes.FILTER_STATE, GatewayContextAttributes.FilterState.COMPLETED);
         }
     }
 }

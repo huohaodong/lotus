@@ -24,6 +24,6 @@ public interface GatewayContextAttributes {
     enum FilterState {
         ABORT_UNAUTHORIZED,
         ABORT_TOO_MANY_REQUEST,
-        COMPLETE
+        COMPLETED
     }
 }

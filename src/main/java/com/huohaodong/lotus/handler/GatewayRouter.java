@@ -71,7 +71,7 @@ public class GatewayRouter {
     public void route(GatewayContext context) {
         Route route = (Route) context.attributes().get(GatewayContextAttributes.ROUTE);
         boolean isKeepAlive = (Boolean) context.attributes().getOrDefault(GatewayContextAttributes.KEEP_ALIVE, false);
-        GatewayContextAttributes.FilterState filterState = (GatewayContextAttributes.FilterState) context.getAttributes().getOrDefault(GatewayContextAttributes.FILTER_STATE, GatewayContextAttributes.FilterState.COMPLETE);
+        GatewayContextAttributes.FilterState filterState = (GatewayContextAttributes.FilterState) context.getAttributes().get(GatewayContextAttributes.FILTER_STATE);
         CompletableFuture<Response> future = GatewayBootstrap.asyncHttpClient.executeRequest(context.getRequest().builder().setUrl(String.valueOf(route.getUri())))
                 .toCompletableFuture();
         future.whenComplete((response, throwable) -> {
@@ -80,7 +80,7 @@ public class GatewayRouter {
                 fullHttpResponse = RESPONSE_NOT_FOUND();
             } else {
                 fullHttpResponse = switch (filterState) {
-                    case COMPLETE -> context.getResponse().builder()
+                    case COMPLETED -> context.getResponse().builder()
                             .headers(response.getHeaders())
                             .httpVersion(HttpVersion.HTTP_1_1)
                             .status(HttpResponseStatus.valueOf(response.getStatusCode()))
