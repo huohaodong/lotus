@@ -13,3 +13,4 @@ routes:
       - Header=h1,h2
     filters:
       - Auth=Authorization,Basic
+#      - TokenBucketGatewayRateLimiter=10,12;

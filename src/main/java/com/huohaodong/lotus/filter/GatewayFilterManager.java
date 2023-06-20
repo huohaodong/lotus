@@ -16,7 +16,6 @@ public class GatewayFilterManager {
     private final Map<String, GatewayFilterFactory> factories = new ConcurrentHashMap<>();
 
     private GatewayFilterManager() {
-        loadDefault();
         loadFromSPI();
     }
 
@@ -29,11 +28,6 @@ public class GatewayFilterManager {
         for (GatewayFilterFactory factory : filterFactories) {
             factories.put(factory.getName(), factory);
         }
-    }
-
-    private void loadDefault() {
-        factories.put(AUTH_FILTER, new AuthFilterFactory());
-        // TODO: 实现 RateLimiterFactory
     }
 
     public GatewayFilter get(FilterDefinition filterDefinition) {
