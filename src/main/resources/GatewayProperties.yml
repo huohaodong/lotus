@@ -1,5 +1,7 @@
 host: 0.0.0.0
 port: 10086
+redisHost: 10.201.0.222
+redisPort: 22221
 routes:
   - id: route1
     uri: http://10.201.0.222:7777/ping
@@ -13,4 +15,5 @@ routes:
       - Header=h1,h2
     filters:
       - Auth=Authorization,Basic
-#      - TokenBucketGatewayRateLimiter=10,12;
+      - TokenBucketRateLimiter=100000 # 令牌数为 10w
+      - RedisRateLimiter=100000,60 # 60 秒内窗口最多 10w 个请求

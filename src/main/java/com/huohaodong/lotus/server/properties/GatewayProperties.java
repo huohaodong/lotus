@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 @Slf4j
 @Data
@@ -44,6 +43,16 @@ public class GatewayProperties {
 
     private int pooledConnectionIdleTimeout = 60 * 1000;
 
+    /**
+     * Redis 相关配置
+     */
+    private String redisHost;
+
+    private int redisPort;
+
+    /**
+     * 路由相关
+     */
     private List<RouteProperties> routes = new ArrayList<>();
 
     public List<RouteDefinition> populate() {
