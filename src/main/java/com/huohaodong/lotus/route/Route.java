@@ -3,6 +3,7 @@ package com.huohaodong.lotus.route;
 import com.huohaodong.lotus.filter.GatewayFilter;
 import com.huohaodong.lotus.predicate.RoutePredicate;
 import com.huohaodong.lotus.server.context.GatewayContext;
+import com.huohaodong.lotus.server.properties.RouteHystrixProperty;
 import lombok.Data;
 
 import java.net.URI;
@@ -20,6 +21,8 @@ public class Route implements Comparable<Route> {
     private final List<RoutePredicate> routePredicates;
 
     private final List<GatewayFilter> filters;
+
+    private final RouteHystrixProperty hystrixProperty;
 
     public boolean match(GatewayContext gatewayContext) {
         for (RoutePredicate predicate : routePredicates) {

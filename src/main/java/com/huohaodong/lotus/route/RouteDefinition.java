@@ -2,6 +2,7 @@ package com.huohaodong.lotus.route;
 
 import com.huohaodong.lotus.filter.FilterDefinition;
 import com.huohaodong.lotus.predicate.PredicateDefinition;
+import com.huohaodong.lotus.server.properties.RouteHystrixProperty;
 import lombok.Data;
 
 import java.net.URI;
@@ -19,5 +20,7 @@ public class RouteDefinition {
     private List<PredicateDefinition> predicates;
 
     private List<FilterDefinition> filters;
+
+    private RouteHystrixProperty hystrixProperty;
 
 }

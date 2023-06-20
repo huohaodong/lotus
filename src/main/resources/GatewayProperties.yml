@@ -17,3 +17,8 @@ routes:
       - Auth=Authorization,Basic
       - TokenBucketRateLimiter=100000 # 令牌数为 10w
       - RedisRateLimiter=100000,60 # 60 秒内窗口最多 10w 个请求
+    hystrix:
+      enable: true
+      threadCoreSize: 5
+      executionTimeoutInMilliseconds: 5000
+      fallback: service is unavailable now

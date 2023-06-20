@@ -104,7 +104,7 @@ public class GatewayRouter {
                     .map(routePredicateFactory::createRoutePredicate)
                     .collect(Collectors.toList());
             List<GatewayFilter> filters = routeDefinition.getFilters().stream().map(gatewayFilterManager::get).toList();
-            return new Route(routeDefinition.getId(), routeDefinition.getUri(), routeDefinition.getOrder(), predicates, filters);
+            return new Route(routeDefinition.getId(), routeDefinition.getUri(), routeDefinition.getOrder(), predicates, filters, routeDefinition.getHystrixProperty());
         }).sorted().collect(Collectors.toCollection(ArrayList::new));
         log.info("Router refreshed with total {} Routes", routes.size());
     }

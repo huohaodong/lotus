@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class RouteProperties {
+
     private String id;
 
     private URI uri;
@@ -19,4 +20,7 @@ public class RouteProperties {
     private List<String> predicates = new ArrayList<>();
 
     private List<String> filters = new ArrayList<>();
+
+    private RouteHystrixProperty hystrix = new RouteHystrixProperty();
+
 }

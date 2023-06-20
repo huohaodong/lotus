@@ -40,7 +40,6 @@ public class GatewayProperties {
     private int maxConnections = 100000;
 
     private int maxConnectionsPerHost = 10000;
-
     private int pooledConnectionIdleTimeout = 60 * 1000;
 
     /**
@@ -83,6 +82,7 @@ public class GatewayProperties {
             }).toList();
             routeDefinition.setPredicates(predicateDefinitions);
             routeDefinition.setFilters(filterDefinitions);
+            routeDefinition.setHystrixProperty(routeProperties.getHystrix());
             return routeDefinition;
         }
     }
