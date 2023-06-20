@@ -42,7 +42,11 @@ public class GatewayRequestHandler extends SimpleChannelInboundHandler<FullHttpR
                     // 3. GatewayFilterChain.filter(GatewayContext)，过滤后的请求最后会转发给 Route Filter 进行转发与响应
                     new DefaultGatewayFilterChain(r.getFilters()).filter(gatewayContext);
                     // 4. 过滤完成后的请求转发给 Async Http Client 进行转发与响应
-                    router.route(gatewayContext);
+                    if (r.getHystrixProperty().isEnable()) {
+                        router.route(gatewayContext, r.getHystrixProperty());
+                    } else {
+                        router.route(gatewayContext);
+                    }
                 },
                 () -> {
                     if (isKeepAlive) {

@@ -40,6 +40,7 @@ public class GatewayProperties {
     private int maxConnections = 100000;
 
     private int maxConnectionsPerHost = 10000;
+
     private int pooledConnectionIdleTimeout = 60 * 1000;
 
     /**
