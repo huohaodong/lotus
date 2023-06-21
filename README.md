@@ -13,7 +13,7 @@
 
 ## 快速开始
 
-## 配置
+### 配置
 
 想要使用 Lotus 转发 HTTP 请求首先需要配置相应的路由规则，即定义相应的 `route` 规则。Lotus 的配置文件默认放置在 `resources` 目录下的 `GatewayProperties.yml` 文件中，下面给出一个标准的配置文件示例：
 
@@ -44,7 +44,7 @@ routes:
       fallback: service is unavailable now # 请求超时后返回给客户端的响应结果
 ```
 
-## 部署
+### 部署
 
 从源码编译（JDK >= 17）：
 
