@@ -11,6 +11,10 @@
 - 集成 Hystrix，支持以 Route 为粒度对 API 进行超时检测并执行相应的熔断与降级策略。
 - 支持接入 Consul、Nacos 等服务发现中间件，并在此基础上提供服务粒度的负载均衡。
 
+<p align="center" width="100%">
+    <img src="https://github.com/huohaodong/lotus/assets/42486690/84910177-2962-462e-81b1-3a1da9668bd7" width=70% height=70%>
+</p>
+
 ## 快速开始
 
 ### 配置
